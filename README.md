@@ -1,6 +1,6 @@
 # unet-liver-segmentation
 
-## U-Net Biomedical Image Segmentation
+## U-Net Biomedical Image Semantic Segmentation
 
 This repository contains the code to perform liver segmentation using [U-Net](https://arxiv.org/abs/1505.04597) and tensorflow.
 
