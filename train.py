@@ -3,7 +3,7 @@ from __future__ import print_function
 import os, sys, pickle
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
+from tensorflow.keras.callbacks import ModelCheckpoint
 
 from loss_function import *
 from train_generator import *
@@ -14,12 +14,14 @@ from unet import *
 tf.config.list_physical_devices('GPU')
 
 metric = SemanticLossFunction()
-model_loaded = AttentionResUnetModel()
+model_loaded = UNETModel()
 os.environ['TF_XLA_FLAGS'] = '--tf_xla_enable_xla_devices'
 
 
 def train():
 
+    train_images_number = 5
+    val_images_number = 2
     train_dataset = TrainGenerator(train_images_number)
     val_dataset = ValGenerator(val_images_number)
 
@@ -29,7 +31,7 @@ def train():
 
     """ Hyperparameters """
     input_shape = (512, 512, 4)
-    lr = 1e-3
+    lr = 1e-4
     _epochs = 50
     _loss=metric.jacard_coef_loss
     _metrics=[metric.jacard_coef, metric.dice_coef, metric.sensitivity, metric.specificity]
@@ -39,14 +41,10 @@ def train():
 
     # Callbacks
     model_checkpoint = ModelCheckpoint('weights.h5', monitor='val_loss', save_best_only=True)
-    tensorboard_callback = TensorBoard(log_dir="./logs")
 
     history = model.fit(train_dataset, epochs=_epochs, verbose=1,
                         validation_data=val_dataset,
                         callbacks=[model_checkpoint, tensorboard_callback])
-
-    file = open('trainHistDict512.txt', 'wb') #training history
-    pickle.dump(history.history, file)
 
     return history
 

@@ -1,6 +1,5 @@
 from tensorflow.keras.utils import Sequence
 import numpy as np
-import cv2
 
 dim_img = 512
 
@@ -46,23 +45,17 @@ class ValGenerator(Sequence):
         X = np.zeros((self.batch_size*VOLUME_SLICES, *self.dim, self.n_channels))
         Y = np.zeros((self.batch_size*VOLUME_SLICES, *self.dim, 1))
 
-        path = f'./data/train/'
+        path = f'./data/val/'
         
         # Generate data
         for c, i in enumerate(Batch_ids):
-
-            abdo = np.load(f'{path}abdos/{i}_abdo.npy')
-            portal = np.load(f'{path}portals/{i}_portal.npy')
-            arteriel = np.load(f'{path}arteriels/{i}_arteriel.npy')
-            veineux = np.load(f'{path}veineux/{i}_veineux.npy')
-            segmentation = np.load(f'{path}segmentations/{i}_segmentation.npy')
         
             for j in range(VOLUME_SLICES):
-                 X[j + VOLUME_SLICES*c, :, :, 0] = self.convert_bw(cv2.resize(abdo[j, :, :], (dim_img,dim_img)))
-                 X[j + VOLUME_SLICES*c, :, :, 1] = self.convert_bw(cv2.resize(portal[j, :, :], (dim_img,dim_img)))
-                 X[j + VOLUME_SLICES*c, :, :, 2] = self.convert_bw(cv2.resize(arteriel[j, :, :], (dim_img,dim_img)))
-                 X[j + VOLUME_SLICES*c, :, :, 3] = self.convert_bw(cv2.resize(veineux[j, :, :], (dim_img,dim_img)))
+                 X[j + VOLUME_SLICES*c, :, :, 0] = np.load(f'{path}abdos/{i}_abdo.npy')
+                 X[j + VOLUME_SLICES*c, :, :, 1] = np.load(f'{path}portals/{i}_portal.npy')
+                 X[j + VOLUME_SLICES*c, :, :, 2] = np.load(f'{path}arteriels/{i}_arteriel.npy')
+                 X[j + VOLUME_SLICES*c, :, :, 3] = np.load(f'{path}veineux/{i}_veineux.npy')
 
-                 Y[j + VOLUME_SLICES*c, :, :, 0] = cv2.resize(segmentation[j, :, :], (dim_img,dim_img))
+                 Y[j + VOLUME_SLICES*c, :, :, 0] = np.load(f'{path}segmentations/{i}_segmentation.npy')
 
         return X, Y
